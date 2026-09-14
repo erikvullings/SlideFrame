@@ -95,9 +95,15 @@ enum GuideGeometry {
 
     static func size(
         width: CGFloat,
-        aspectRatio: GuideAspectRatio = .widescreen
+        aspectRatio: GuideAspectRatio = .widescreen,
+        quantized: Bool = true
     ) -> CGSize {
         let pair = integerPair(for: aspectRatio)
+        if !quantized {
+            let minimumWidth = max(minimumSize.width, minimumSize.height * aspectRatio.value)
+            let resolvedWidth = max(minimumWidth, width)
+            return CGSize(width: resolvedWidth, height: resolvedWidth / aspectRatio.value)
+        }
         let units = max(
             Int(ceil(minimumSize.width / pair.width)),
             Int(ceil(minimumSize.height / pair.height)),
@@ -108,9 +114,15 @@ enum GuideGeometry {
 
     static func size(
         height: CGFloat,
-        aspectRatio: GuideAspectRatio = .widescreen
+        aspectRatio: GuideAspectRatio = .widescreen,
+        quantized: Bool = true
     ) -> CGSize {
         let pair = integerPair(for: aspectRatio)
+        if !quantized {
+            let minimumHeight = max(minimumSize.height, minimumSize.width / aspectRatio.value)
+            let resolvedHeight = max(minimumHeight, height)
+            return CGSize(width: resolvedHeight * aspectRatio.value, height: resolvedHeight)
+        }
         let units = max(
             Int(ceil(minimumSize.width / pair.width)),
             Int(ceil(minimumSize.height / pair.height)),
@@ -123,7 +135,8 @@ enum GuideGeometry {
         from frame: CGRect,
         corner: GuideCorner,
         translation: CGSize,
-        aspectRatio: GuideAspectRatio = .widescreen
+        aspectRatio: GuideAspectRatio = .widescreen,
+        quantized: Bool = true
     ) -> CGRect {
         let anchor = oppositePoint(of: corner, in: frame)
         let dragged = cornerPoint(of: corner, in: frame)
@@ -140,7 +153,8 @@ enum GuideGeometry {
         )
         let constrainedSize = size(
             width: max(minimumSize.width, projectedWidth),
-            aspectRatio: aspectRatio
+            aspectRatio: aspectRatio,
+            quantized: quantized
         )
 
         return CGRect(
@@ -153,9 +167,24 @@ enum GuideGeometry {
 
     static func fittedFrame(
         in visibleFrame: CGRect,
-        aspectRatio: GuideAspectRatio = .widescreen
+        aspectRatio: GuideAspectRatio = .widescreen,
+        quantized: Bool = true
     ) -> CGRect {
         let pair = integerPair(for: aspectRatio)
+        if !quantized {
+            let maximumWidth = min(visibleFrame.width, visibleFrame.height * aspectRatio.value)
+            let fittedSize = size(
+                width: maximumWidth,
+                aspectRatio: aspectRatio,
+                quantized: false
+            )
+            return CGRect(
+                x: visibleFrame.midX - fittedSize.width / 2,
+                y: visibleFrame.midY - fittedSize.height / 2,
+                width: fittedSize.width,
+                height: fittedSize.height
+            )
+        }
         let minimumUnits = max(
             Int(ceil(minimumSize.width / pair.width)),
             Int(ceil(minimumSize.height / pair.height))
@@ -181,9 +210,14 @@ enum GuideGeometry {
 
     static func normalized(
         _ frame: CGRect,
-        aspectRatio: GuideAspectRatio = .widescreen
+        aspectRatio: GuideAspectRatio = .widescreen,
+        quantized: Bool = true
     ) -> CGRect {
-        let normalizedSize = size(width: frame.width, aspectRatio: aspectRatio)
+        let normalizedSize = size(
+            width: frame.width,
+            aspectRatio: aspectRatio,
+            quantized: quantized
+        )
         return CGRect(
             x: frame.origin.x.rounded(),
             y: frame.origin.y.rounded(),
@@ -195,9 +229,14 @@ enum GuideGeometry {
     static func restoredFrame(
         _ savedFrame: CGRect,
         visibleFrames: [CGRect],
-        aspectRatio: GuideAspectRatio = .widescreen
+        aspectRatio: GuideAspectRatio = .widescreen,
+        quantized: Bool = true
     ) -> CGRect {
-        let frame = normalized(savedFrame, aspectRatio: aspectRatio)
+        let frame = normalized(
+            savedFrame,
+            aspectRatio: aspectRatio,
+            quantized: quantized
+        )
         guard !visibleFrames.isEmpty else { return frame }
         if visibleFrames.contains(where: { sufficientlyVisible(frame, on: $0) }) {
             return frame

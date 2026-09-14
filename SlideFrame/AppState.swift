@@ -34,7 +34,8 @@ final class AppState: ObservableObject {
         innerFrame = GuideGeometry.restoredFrame(
             innerFrame,
             visibleFrames: screens.map(\.visibleFrame),
-            aspectRatio: aspectRatio
+            aspectRatio: aspectRatio,
+            quantized: aspectMode != .currentDisplay
         )
         apertureSize = innerFrame.size
 

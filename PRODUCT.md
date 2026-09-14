@@ -29,7 +29,7 @@ The app runs only in the macOS menu bar. Users work across Retina and non-Retina
 ## Capabilities and Constraints
 
 - A transparent inner aperture with an outside 2-point guide border, compact in-frame controls, and four restrained corner handles.
-- The boundary can be hidden independently, leaving the compact dimensions/aspect capsule available.
+- The boundary can be hidden independently, leaving the compact dimensions/aspect capsule available; Hide Frame hides the complete overlay without discarding geometry.
 - Exact presets: 960x540, 1280x720, 1600x900, and 1920x1080 logical points.
 - Named aspect modes: 16:9, 4:3, 21:9, 9:16, 3:4, and the current display ratio.
 - Corner resize keeps the opposite corner anchored, enforces the selected ratio, and never goes below 320x180.
@@ -59,7 +59,7 @@ No external brand assets, commercial claims, screenshots, or supplied imagery ex
 - The menu bar remains the complete fallback control surface; the compact badge provides frequent size and quit actions.
 - Native full-area dragging keeps movement directly coupled to the pointer while controls and corner handles retain priority.
 - Open/closed-hand cursor feedback communicates the full-area move interaction.
-- A simple Dock icon exposes standard macOS app management, including Quit.
+- The app is menu-bar-only with no Dock icon; Quit remains available from both native control surfaces.
 
 ## Accessibility & Inclusion
 

@@ -114,10 +114,36 @@ final class GuideGeometryTests: XCTestCase {
         let ratio = GuideAspectRatio(displaySize: CGSize(width: 1512, height: 982))
         let fitted = GuideGeometry.fittedFrame(
             in: CGRect(x: 0, y: 0, width: 1512, height: 982),
-            aspectRatio: ratio
+            aspectRatio: ratio,
+            quantized: false
         )
         XCTAssertEqual(fitted.size, CGSize(width: 1512, height: 982))
         XCTAssertEqual(fitted.width / fitted.height, ratio.value, accuracy: 0.000_001)
+    }
+
+    func testCurrentDisplayRatioUsesLargestFitBelowMenuBar() {
+        let ratio = GuideAspectRatio(displaySize: CGSize(width: 1512, height: 982))
+        let visible = CGRect(x: 0, y: 0, width: 1512, height: 959)
+        let fitted = GuideGeometry.fittedFrame(
+            in: visible,
+            aspectRatio: ratio,
+            quantized: false
+        )
+        XCTAssertEqual(fitted.height, visible.height, accuracy: 0.000_001)
+        XCTAssertEqual(fitted.width / fitted.height, ratio.value, accuracy: 0.000_001)
+        XCTAssertTrue(visible.contains(fitted))
+    }
+
+    func testCurrentDisplayModeUsesContinuousFitWhenRatioEqualsNamedRatio() {
+        let visible = CGRect(x: 0, y: 0, width: 1512, height: 959)
+        let fitted = GuideGeometry.fittedFrame(
+            in: visible,
+            aspectRatio: .widescreen,
+            quantized: false
+        )
+        XCTAssertEqual(fitted.width, 1512, accuracy: 0.000_001)
+        XCTAssertEqual(fitted.height, 850.5, accuracy: 0.000_001)
+        XCTAssertTrue(visible.contains(fitted))
     }
 
     func testRestorePreservesNegativeOriginWhenVisible() {

@@ -58,7 +58,11 @@ final class GuidePanelController: NSObject, NSWindowDelegate {
     ) {
         self.aspectRatio = aspectRatio
         self.aspectMode = aspectMode
-        self.innerFrame = GuideGeometry.normalized(innerFrame, aspectRatio: aspectRatio)
+        self.innerFrame = GuideGeometry.normalized(
+            innerFrame,
+            aspectRatio: aspectRatio,
+            quantized: aspectMode != .currentDisplay
+        )
         viewModel = GuideViewModel(
             apertureSize: self.innerFrame.size,
             guideColor: color,
@@ -102,7 +106,11 @@ final class GuidePanelController: NSObject, NSWindowDelegate {
     }
 
     func setInnerFrame(_ frame: CGRect, notify: Bool = true) {
-        innerFrame = GuideGeometry.normalized(frame, aspectRatio: aspectRatio)
+        innerFrame = GuideGeometry.normalized(
+            frame,
+            aspectRatio: aspectRatio,
+            quantized: aspectMode != .currentDisplay
+        )
         viewModel.apertureSize = innerFrame.size
         panel.setFrame(GuidePanelLayout.panelFrame(for: innerFrame), display: true)
         panel.contentView?.needsLayout = true
@@ -118,7 +126,8 @@ final class GuidePanelController: NSObject, NSWindowDelegate {
         setInnerFrame(
             GuideGeometry.fittedFrame(
                 in: screen.visibleFrame,
-                aspectRatio: aspectRatio
+                aspectRatio: aspectRatio,
+                quantized: aspectMode != .currentDisplay
             )
         )
     }
@@ -148,7 +157,8 @@ final class GuidePanelController: NSObject, NSWindowDelegate {
         let restored = GuideGeometry.restoredFrame(
             innerFrame,
             visibleFrames: NSScreen.screens.map(\.visibleFrame),
-            aspectRatio: aspectRatio
+            aspectRatio: aspectRatio,
+            quantized: aspectMode != .currentDisplay
         )
         if restored != innerFrame {
             setInnerFrame(restored)
@@ -164,7 +174,8 @@ final class GuidePanelController: NSObject, NSWindowDelegate {
             from: start,
             corner: corner,
             translation: translation,
-            aspectRatio: aspectRatio
+            aspectRatio: aspectRatio,
+            quantized: aspectMode != .currentDisplay
         )
         setInnerFrame(resized, notify: ended)
         if ended {

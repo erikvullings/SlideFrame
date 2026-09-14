@@ -10,11 +10,11 @@ SlideFrame is a macOS 14+ menu-bar utility for positioning an exact screenshot g
 - Package: `./scripts/package.sh`
 - Start: `open release/SlideFrame.app`
 
-SlideFrame has no main window. Use its menu-bar icon to show/hide the guide, choose a size or ratio, fit or center it, change its border color, enable click-through, reset, or quit. Its Dock icon provides the standard macOS Quit command.
+SlideFrame is menu-bar-only: it has no Dock icon or main window. Use its menu-bar icon to show/hide the guide, choose a size or ratio, fit or center it, change its border color, enable click-through, reset, or quit.
 
 ## Guide semantics
 
-Displayed dimensions are the transparent **inner aperture**, measured in logical AppKit points, not pixels. The 2-point border is drawn outside that boundary. Drag anywhere in the transparent interior that is not a control to move the frame with native pointer tracking; the cursor changes from an open hand to a closed hand while moving. Drag one of four corner handles to resize at the selected ratio while keeping the opposite corner fixed. The compact in-frame capsule shows dimensions and aspect ratio and exposes border visibility, size/ratio selection, and Quit. Hiding the border leaves only this capsule visible. Click Through hides the capsule and handles and passes input to apps below; use the menu bar to turn it off.
+Displayed dimensions are the transparent **inner aperture**, measured in logical AppKit points, not pixels. The 2-point border is drawn outside that boundary. Drag anywhere in the transparent interior that is not a control to move the frame with native pointer tracking; the cursor changes from an open hand to a closed hand while moving. Drag one of four corner handles to resize at the selected ratio while keeping the opposite corner fixed. The compact in-frame capsule shows dimensions and aspect ratio and exposes border visibility, size/ratio selection, and Quit. Hiding the border leaves only this capsule visible; Hide Frame hides the entire overlay without losing geometry. Click Through hides the capsule and handles and passes input to apps below; use the menu bar to turn it off.
 
 The four exact presets—960 × 540, 1280 × 720, 1600 × 900, and 1920 × 1080—select 16:9. Other ratio modes fit to the current display when selected. Current Display Ratio derives its ratio from the active screen.
 

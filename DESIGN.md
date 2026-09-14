@@ -42,7 +42,7 @@ components:
 
 **Creative North Star: "The Desktop Aperture"**
 
-SlideFrame is a restrained native measuring instrument, not an application window laid over the desktop. Its transparent field leaves the user's work visually untouched while one exact perimeter, one compact in-frame control capsule, and four quiet corner handles communicate the complete overlay state.
+SlideFrame is a restrained native measuring instrument, not an application window laid over the desktop. It runs as an `LSUIElement` utility whose `rectangle.inset.filled` menu-bar status item is the persistent application surface. Its transparent field leaves the user's work visually untouched while one exact perimeter, one compact in-frame control capsule, and four quiet corner handles communicate the complete overlay state.
 
 The system is sparse, direct, and geometrically trustworthy. It uses macOS-native material, menus, cursors, SF Symbols, and system type rather than decorative chrome. Multiple output ratios are first-class, but the overlay keeps one consistent visual vocabulary across them.
 
@@ -52,6 +52,7 @@ The system is sparse, direct, and geometrically trustworthy. It uses macOS-nativ
 - Four exact 16:9 presets coexist with 16:9, 4:3, 21:9, 9:16, 3:4, and current-display ratio modes.
 - Native full-area dragging uses open- and closed-hand cursor feedback while capsule controls and corner handles retain interaction priority.
 - The in-frame capsule reports dimensions and aspect ratio and exposes frequent border, size, and quit actions.
+- The menu-bar status item remains the complete native control surface when the overlay is hidden or click-through is enabled.
 
 ## Colors
 
@@ -124,7 +125,7 @@ Geometry is rectilinear and exact. The aperture is a sharp rectangle with a two-
 - **Color:** Presentation blue by default; one user-selected working alternative may replace it.
 - **Contrast:** Increased Contrast adds a one-point opposing outline without moving the inner boundary.
 - **Interaction:** A full-area native AppKit drag surface delegates movement to `NSWindow.performDrag`. The cursor is an open hand at rest and a closed hand while dragging. The panel never activates or becomes key.
-- **Visibility:** The boundary can be hidden independently, leaving only the capsule.
+- **Visibility:** Persisted Hide Border / Show Border state affects the perimeter and handles only, leaving the capsule visible. Show / Hide Frame orders the complete overlay in or out without changing its retained geometry.
 
 ### Control Capsule
 - **Shape:** A 22-point-high capsule with 7-point horizontal padding and 5-point item spacing, centered just inside the aperture's top edge.
@@ -140,13 +141,11 @@ Geometry is rectilinear and exact. The aperture is a sharp rectangle with a two-
 - **State:** Handles appear only while the boundary is visible and interaction is enabled.
 
 ### Native Menu
-- **Style:** A standard `MenuBarExtra` menu with native buttons, submenus, dividers, checkmarks, keyboard shortcuts, and the `rectangle.inset.filled` SF Symbol.
+- **Status Item:** A standard `MenuBarExtra` labeled SlideFrame with the `rectangle.inset.filled` SF Symbol; `LSUIElement` keeps the utility menu-bar-only.
+- **Style:** Native buttons, submenus, dividers, checkmarks, and keyboard shortcuts.
 - **Organization:** Frame and border visibility come first; size, fit, and center follow; click-through and border color come next; Reset and Quit close the menu.
+- **Visibility Command:** Show Frame / Hide Frame restores or removes the entire overlay as one persistent geometry-bearing panel; it is distinct from the persisted border-only toggle.
 - **Role:** The menu bar is the complete fallback control surface for every overlay state.
-
-### Dock Icon
-- **Style:** A simple rounded-square blue icon showing a white aperture, four black corner handles, and one dark `16:9` capsule.
-- **Role:** It echoes the shipped overlay without adding a separate brand illustration and supports standard macOS Dock management.
 
 ## Do's and Don'ts
 
@@ -158,6 +157,7 @@ Geometry is rectilinear and exact. The aperture is a sharp rectangle with a two-
 - **Do** keep dimensions, aspect ratio, border visibility, size choices, and quit available in the compact in-frame capsule.
 - **Do** allow the boundary-hidden capsule-only state and hide capsule plus handles during click-through.
 - **Do** rely on native macOS menus, materials, system colors, typography, symbols, and cursor behavior.
+- **Do** keep `LSUIElement`, the SlideFrame menu-bar status item, and its native menu as the complete application shell.
 
 ### Don't:
 - **Don't** add dashboard chrome, inspectors, floating toolbars, title bars, or opaque framing surfaces.
@@ -167,3 +167,4 @@ Geometry is rectilinear and exact. The aperture is a sharp rectangle with a two-
 - **Don't** hide the capsule merely because the boundary is hidden.
 - **Don't** add window shadows or decorative animation; state changes are immediate.
 - **Don't** replace native menu affordances or system typography with web-shaped controls or display faces.
+- **Don't** introduce an additional application-launcher surface or ordinary app-window lifecycle.

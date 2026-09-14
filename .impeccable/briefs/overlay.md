@@ -29,7 +29,7 @@ The signature interaction is direct native full-area dragging with open/closed-h
 ## States
 
 - Visible and interactive: compact move/size/quit capsule and four corner handles shown.
-- Boundary hidden: only the compact capsule remains visible, with its restore action available.
+- Boundary hidden: only the compact dimensions/aspect capsule remains visible, with its restore action available.
 - Visible and click-through: panel ignores pointer events; badge and handles hidden.
 - Hidden: geometry retained without destroying the panel.
 - Increased contrast: stronger badge separation and handle/border clarity without changing aperture dimensions.

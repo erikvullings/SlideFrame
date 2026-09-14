@@ -97,7 +97,7 @@ struct GuideView: View {
                     .frame(width: 16, height: 18)
             }
             .buttonStyle(.plain)
-            .help(model.borderVisible ? "Hide frame" : "Show frame")
+            .help(model.borderVisible ? "Hide frame border" : "Show frame border")
 
             Button(action: onShowSizeMenu) {
                 HStack(spacing: 3) {

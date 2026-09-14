@@ -127,9 +127,34 @@ do {
     let displayRatio = GuideAspectRatio(displaySize: CGSize(width: 1512, height: 982))
     let displayFit = GuideGeometry.fittedFrame(
         in: CGRect(x: 0, y: 0, width: 1512, height: 982),
-        aspectRatio: displayRatio
+        aspectRatio: displayRatio,
+        quantized: false
     )
     try expect(displayFit.size, CGSize(width: 1512, height: 982), "display ratio exactness")
+    let menuBarVisible = CGRect(x: 0, y: 0, width: 1512, height: 959)
+    let menuBarFit = GuideGeometry.fittedFrame(
+        in: menuBarVisible,
+        aspectRatio: displayRatio,
+        quantized: false
+    )
+    try expect(
+        abs(menuBarFit.height - menuBarVisible.height) < 0.000_001,
+        "display ratio largest visible fit"
+    )
+    try expect(
+        abs(menuBarFit.width / menuBarFit.height - displayRatio.value) < 0.000_001,
+        "display ratio fit exactness"
+    )
+    let widescreenDisplayFit = GuideGeometry.fittedFrame(
+        in: menuBarVisible,
+        aspectRatio: .widescreen,
+        quantized: false
+    )
+    try expect(
+        abs(widescreenDisplayFit.width - 1512) < 0.000_001
+            && abs(widescreenDisplayFit.height - 850.5) < 0.000_001,
+        "named-equivalent display ratio continuous fit"
+    )
 
     let saved = CGRect(x: 2200, y: 200, width: 1280, height: 720)
     let primary = CGRect(x: 0, y: 0, width: 1440, height: 900)
