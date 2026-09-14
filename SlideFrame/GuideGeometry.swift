@@ -65,6 +65,17 @@ enum GuideAspectMode: String, Codable, Equatable, Sendable {
         case .currentDisplay: "Display"
         }
     }
+
+    static func inferred(from ratio: GuideAspectRatio) -> GuideAspectMode {
+        switch ratio {
+        case .widescreen: .widescreen
+        case .standard: .standard
+        case .ultrawide: .ultrawide
+        case .mobilePortrait: .mobilePortrait
+        case .classicPortrait: .classicPortrait
+        default: .currentDisplay
+        }
+    }
 }
 
 enum GuideCorner: CaseIterable, Sendable {

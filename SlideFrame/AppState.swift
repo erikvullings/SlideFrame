@@ -112,15 +112,7 @@ final class AppState: ObservableObject {
     }
 
     func applyAspectRatio(_ ratio: GuideAspectRatio) {
-        let mode: GuideAspectMode
-        switch ratio {
-        case .widescreen: mode = .widescreen
-        case .standard: mode = .standard
-        case .ultrawide: mode = .ultrawide
-        case .mobilePortrait: mode = .mobilePortrait
-        case .classicPortrait: mode = .classicPortrait
-        default: mode = .currentDisplay
-        }
+        let mode = GuideAspectMode.inferred(from: ratio)
         controller?.setAspectRatio(ratio, mode: mode)
         controller?.fitToCurrentScreen()
     }

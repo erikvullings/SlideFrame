@@ -190,6 +190,28 @@ do {
     )
     store.save(preferences)
     try expect(store.load(), preferences, "preference round trip")
+
+    struct LegacyPreferences: Codable {
+        let innerFrame: PersistedFrame?
+        let color: GuideColor
+        let clickThrough: Bool
+        let isVisible: Bool
+        let aspectRatio: GuideAspectRatio
+    }
+    defaults.set(
+        try JSONEncoder().encode(
+            LegacyPreferences(
+                innerFrame: nil,
+                color: .presentationBlue,
+                clickThrough: false,
+                isVisible: true,
+                aspectRatio: .ultrawide
+            )
+        ),
+        forKey: "framePreferences"
+    )
+    try expect(store.load().aspectMode, .ultrawide, "legacy named aspect inference")
+
     store.reset()
     try expect(store.load(), .defaults, "preference reset")
 

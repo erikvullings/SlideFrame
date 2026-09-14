@@ -96,7 +96,7 @@ struct FramePreferences: Codable, Equatable, Sendable {
         aspectMode = try container.decodeIfPresent(
             GuideAspectMode.self,
             forKey: .aspectMode
-        ) ?? (aspectRatio == .widescreen ? .widescreen : .currentDisplay)
+        ) ?? GuideAspectMode.inferred(from: aspectRatio)
     }
 }
 
