@@ -2,6 +2,8 @@
 
 SlideFrame is a macOS 14+ menu-bar utility for positioning an exact screenshot guide over the desktop. It supports 16:9, 4:3, 21:9, 9:16, 3:4, and the current display ratio.
 
+![SlideFrame showing a 960 × 540, 16:9 guide over a macOS application](docs/images/slideframe-in-action.png)
+
 ## Build and run
 
 - Xcode: open `SlideFrame.xcodeproj`, select **My Mac**, then run.
