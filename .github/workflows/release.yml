@@ -147,11 +147,22 @@ jobs:
           grep -qw arm64 <<< "$ARCHITECTURES"
           grep -qw x86_64 <<< "$ARCHITECTURES"
 
-      - uses: softprops/action-gh-release@v2
-        with:
-          files: ${{ steps.package.outputs.asset_name }}
-          generate_release_notes: true
-          prerelease: ${{ contains(github.ref_name, '-') }}
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ASSET_NAME: ${{ steps.package.outputs.asset_name }}
+        run: |
+          ARGS=(
+            release create "$GITHUB_REF_NAME"
+            "$ASSET_NAME"
+            --repo "$GITHUB_REPOSITORY"
+            --title "$GITHUB_REF_NAME"
+            --generate-notes
+          )
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then
+            ARGS+=(--prerelease)
+          fi
+          gh "${ARGS[@]}"
 
       - name: Remove temporary signing credentials
         if: always()
