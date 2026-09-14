@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-14T16:01:12.236+02:00",
+  "title": "Design System: SlideFrame",
+  "extensions": {
+    "colorMeta": {
+      "presentation-blue": {
+        "role": "primary",
+        "displayName": "Presentation Blue",
+        "canonical": "rgb(10% 48% 100%)",
+        "tonalRamp": ["#001933", "#002e66", "#004599", "#005dcc", "#1a7aff", "#66a5ff", "#b3d2ff", "#e6f0ff"]
+      },
+      "working-white": {
+        "role": "neutral",
+        "displayName": "Working White",
+        "canonical": "white",
+        "tonalRamp": ["#262626", "#4d4d4d", "#737373", "#999999", "#bfbfbf", "#d9d9d9", "#f2f2f2", "#ffffff"]
+      },
+      "working-black": {
+        "role": "neutral",
+        "displayName": "Working Black",
+        "canonical": "black",
+        "tonalRamp": ["#000000", "#1a1a1a", "#404040", "#666666", "#8c8c8c", "#b3b3b3", "#d9d9d9", "#f2f2f2"]
+      },
+      "working-red": {
+        "role": "secondary",
+        "displayName": "Working Red",
+        "canonical": "red",
+        "tonalRamp": ["#4d0000", "#800000", "#b30000", "#e60000", "#ff3333", "#ff7373", "#ffb3b3", "#ffe6e6"]
+      },
+      "transparent-field": {
+        "role": "neutral",
+        "displayName": "Transparent Field",
+        "canonical": "transparent",
+        "tonalRamp": ["rgba(0,0,0,0)", "rgba(0,0,0,0)", "rgba(0,0,0,0)", "rgba(0,0,0,0)", "rgba(0,0,0,0)", "rgba(0,0,0,0)", "rgba(0,0,0,0)", "rgba(0,0,0,0)"]
+      }
+    },
+    "typographyMeta": {
+      "measurement-label": {
+        "displayName": "Measurement Label",
+        "purpose": "Exact logical-point dimensions and active aspect ratio inside the control capsule."
+      },
+      "capsule-icon": {
+        "displayName": "Capsule Symbol",
+        "purpose": "Native move, border, disclosure, and quit actions."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "immediate",
+        "value": "none",
+        "purpose": "Native full-area dragging, ratio-preserving corner resizing, and state changes use no decorative animation."
+      }
+    ],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "Guide Perimeter",
+      "kind": "custom",
+      "description": "Transparent aperture at the selected ratio with an outside two-point boundary, an in-frame control capsule, exactly four corner handles, and a full-area move surface.",
+      "html": "<div class=\"ds-guide-shell\" aria-label=\"SlideFrame 1280 × 720, 16:9\"><div class=\"ds-guide-aperture\"><div class=\"ds-control-capsule\"><svg class=\"ds-move\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M8 1v14M5.5 3.5 8 1l2.5 2.5M5.5 12.5 8 15l2.5-2.5M1 8h14M3.5 5.5 1 8l2.5 2.5M12.5 5.5 15 8l-2.5 2.5\"/></svg><button class=\"ds-icon-button\" aria-label=\"Hide border\"><svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><rect x=\"2\" y=\"3\" width=\"12\" height=\"10\" rx=\"1\"/></svg></button><button class=\"ds-size-button\">1280 × 720 · 16:9<svg viewBox=\"0 0 10 6\" aria-hidden=\"true\"><path d=\"m1 1 4 4 4-4\"/></svg></button><button class=\"ds-icon-button\" aria-label=\"Quit\"><svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"m3 3 10 10M13 3 3 13\"/></svg></button></div><i class=\"ds-handle ds-handle-tl\"></i><i class=\"ds-handle ds-handle-tr\"></i><i class=\"ds-handle ds-handle-br\"></i><i class=\"ds-handle ds-handle-bl\"></i></div></div>",
+      "css": ".ds-guide-shell { position: relative; width: 336px; height: 196px; background: transparent; cursor: grab; } .ds-guide-shell:active { cursor: grabbing; } .ds-guide-aperture { position: absolute; inset: 8px; background: transparent; box-shadow: 0 0 0 2px rgb(10% 48% 100%); } .ds-control-capsule { position: absolute; z-index: 3; left: 50%; top: 4px; transform: translateX(-50%); height: 22px; display: inline-flex; align-items: center; gap: 5px; padding: 0 7px; border: 1px solid color-mix(in srgb, CanvasText 18%, transparent); border-radius: 999px; color: CanvasText; background: color-mix(in srgb, Canvas 72%, transparent); backdrop-filter: blur(20px); white-space: nowrap; } .ds-move { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.2; pointer-events: none; } .ds-icon-button, .ds-size-button { height: 18px; padding: 0; border: 0; color: inherit; background: transparent; cursor: pointer; } .ds-icon-button { width: 16px; } .ds-icon-button svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.5; } .ds-size-button { display: inline-flex; align-items: center; gap: 3px; font: 500 12px 'SF Pro Rounded', system-ui, sans-serif; font-variant-numeric: tabular-nums; } .ds-size-button svg { width: 8px; height: 5px; fill: none; stroke: currentColor; stroke-width: 1.4; } .ds-icon-button:hover, .ds-size-button:hover { color: rgb(10% 48% 100%); } .ds-icon-button:focus-visible, .ds-size-button:focus-visible { outline: 1px solid CanvasText; outline-offset: 1px; } .ds-handle { position: absolute; z-index: 2; width: 8px; height: 8px; border: 1px solid color-mix(in srgb, black 40%, transparent); border-radius: 1.5px; background: rgb(10% 48% 100%); } .ds-handle-tl { left: -6px; top: -6px; cursor: nwse-resize; } .ds-handle-tr { right: -6px; top: -6px; cursor: nesw-resize; } .ds-handle-br { right: -6px; bottom: -6px; cursor: nwse-resize; } .ds-handle-bl { left: -6px; bottom: -6px; cursor: nesw-resize; } .ds-guide-shell[data-boundary-hidden='true'] .ds-guide-aperture { box-shadow: none; } .ds-guide-shell[data-boundary-hidden='true'] .ds-handle, .ds-guide-shell[data-click-through='true'] .ds-control-capsule, .ds-guide-shell[data-click-through='true'] .ds-handle { display: none; }"
+    },
+    {
+      "name": "Control Capsule",
+      "kind": "chip",
+      "refersTo": "control-capsule",
+      "description": "Compact native-material cluster for movement feedback, border visibility, exact size and ratio selection, and Quit.",
+      "html": "<div class=\"ds-capsule\"><svg class=\"ds-capsule-move\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M8 1v14M5.5 3.5 8 1l2.5 2.5M5.5 12.5 8 15l2.5-2.5M1 8h14M3.5 5.5 1 8l2.5 2.5M12.5 5.5 15 8l-2.5 2.5\"/></svg><button class=\"ds-capsule-icon\" aria-label=\"Hide border\"><svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><rect x=\"2\" y=\"3\" width=\"12\" height=\"10\" rx=\"1\"/></svg></button><button class=\"ds-capsule-size\">1280 × 720 · 16:9<svg viewBox=\"0 0 10 6\" aria-hidden=\"true\"><path d=\"m1 1 4 4 4-4\"/></svg></button><button class=\"ds-capsule-icon\" aria-label=\"Quit\"><svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"m3 3 10 10M13 3 3 13\"/></svg></button></div>",
+      "css": ".ds-capsule { height: 22px; display: inline-flex; align-items: center; gap: 5px; padding: 0 7px; border: 1px solid color-mix(in srgb, CanvasText 18%, transparent); border-radius: 999px; color: CanvasText; background: color-mix(in srgb, Canvas 72%, transparent); backdrop-filter: blur(20px); white-space: nowrap; } .ds-capsule-move { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.2; } .ds-capsule-icon, .ds-capsule-size { height: 18px; padding: 0; border: 0; color: inherit; background: transparent; cursor: pointer; } .ds-capsule-icon { width: 16px; } .ds-capsule-icon svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.5; } .ds-capsule-size { display: inline-flex; align-items: center; gap: 3px; font: 500 12px 'SF Pro Rounded', system-ui, sans-serif; font-variant-numeric: tabular-nums; } .ds-capsule-size svg { width: 8px; height: 5px; fill: none; stroke: currentColor; stroke-width: 1.4; } .ds-capsule-icon:hover, .ds-capsule-size:hover { color: rgb(10% 48% 100%); } .ds-capsule-icon:focus-visible, .ds-capsule-size:focus-visible { outline: 1px solid CanvasText; outline-offset: 1px; }"
+    },
+    {
+      "name": "Corner Handle",
+      "kind": "custom",
+      "refersTo": "corner-handle",
+      "description": "One of exactly four corner resize affordances; dragging preserves the active ratio with the opposite corner anchored.",
+      "html": "<span class=\"ds-corner-handle\" role=\"img\" aria-label=\"Resize from corner\"></span>",
+      "css": ".ds-corner-handle { display: inline-block; width: 8px; height: 8px; border: 1px solid color-mix(in srgb, black 40%, transparent); border-radius: 1.5px; background: rgb(10% 48% 100%); cursor: nwse-resize; } .ds-corner-handle:hover { border-color: black; } .ds-corner-handle:focus-visible { outline: 1px solid CanvasText; outline-offset: 2px; }"
+    },
+    {
+      "name": "Dock Icon",
+      "kind": "custom",
+      "description": "Simple shipped app icon: a blue rounded square containing a white aperture, four black corner handles, and a dark 16:9 capsule.",
+      "html": "<div class=\"ds-dock-icon\" role=\"img\" aria-label=\"SlideFrame app icon\"><div class=\"ds-icon-frame\"><i></i><i></i><i></i><i></i><span>16:9</span></div></div>",
+      "css": ".ds-dock-icon { width: 160px; height: 160px; display: grid; place-items: center; border-radius: 36px; background: linear-gradient(145deg, #168cff, #0451b9); } .ds-icon-frame { position: relative; width: 106px; height: 62px; border: 5px solid white; } .ds-icon-frame i { position: absolute; width: 12px; height: 12px; border-radius: 2px; background: black; } .ds-icon-frame i:nth-child(1) { left: -8px; top: -8px; } .ds-icon-frame i:nth-child(2) { right: -8px; top: -8px; } .ds-icon-frame i:nth-child(3) { right: -8px; bottom: -8px; } .ds-icon-frame i:nth-child(4) { left: -8px; bottom: -8px; } .ds-icon-frame span { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 5px 14px; border-radius: 999px; color: white; background: #22345a; font: 600 14px system-ui, sans-serif; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Desktop Aperture",
+    "overview": "SlideFrame is a restrained native measuring instrument, not an application window laid over the desktop. Its transparent field leaves the user's work visually untouched while one exact perimeter, one compact in-frame control capsule, and four quiet corner handles communicate the complete overlay state.\n\nThe system is sparse, direct, and geometrically trustworthy. It uses macOS-native material, menus, cursors, SF Symbols, and system type rather than decorative chrome. Multiple output ratios are first-class, but the overlay keeps one consistent visual vocabulary across them.",
+    "keyCharacteristics": [
+      "A transparent aperture at the selected ratio is the dominant form.",
+      "Presentation blue is the default working signal; white, black, and red are contrast alternatives.",
+      "Four exact 16:9 presets coexist with 16:9, 4:3, 21:9, 9:16, 3:4, and current-display ratio modes.",
+      "Native full-area dragging uses open- and closed-hand cursor feedback while capsule controls and corner handles retain interaction priority.",
+      "The in-frame capsule reports dimensions and aspect ratio and exposes frequent border, size, and quit actions."
+    ],
+    "rules": [
+      {"name": "The Boundary-Only Color Rule", "body": "Working colors identify the measured perimeter and handles; they do not decorate menus or create branded surfaces.", "section": "colors"},
+      {"name": "The Functional Alternatives Rule", "body": "White, black, and red are user-selected contrast tools, never a simultaneous palette.", "section": "colors"},
+      {"name": "The Measurement Type Rule", "body": "Dimensions and ratio use SF Pro Rounded medium with tabular numerals; command text and symbols stay at native macOS defaults.", "section": "typography"},
+      {"name": "The Inner-Boundary Rule", "body": "Preset dimensions describe the transparent inner aperture; the two-point guide stroke sits outside it and must never reduce the captured area.", "section": "layout"},
+      {"name": "The Selected-Ratio Rule", "body": "Fit, restore, and corner resize preserve the active ratio; only the four exact presets force 16:9.", "section": "layout"},
+      {"name": "The Direct-Manipulation Rule", "body": "The full clear panel moves natively with open- and closed-hand feedback; capsule controls and corner handles remain above that move surface.", "section": "layout"},
+      {"name": "The No-Window-Chrome Rule", "body": "The guide has no opaque panel surface, title bar, window shadow, or decorative elevation.", "section": "elevation"}
+    ],
+    "dos": [
+      "Do keep the desktop and framed content fully transparent and visually untouched.",
+      "Do preserve the selected ratio during fit, restore, and exact opposite-corner resizing.",
+      "Do keep all four exact presets at 16:9 while exposing the five named ratios and current-display ratio.",
+      "Do use full-area native dragging with open- and closed-hand feedback.",
+      "Do keep dimensions, aspect ratio, border visibility, size choices, and quit available in the compact in-frame capsule.",
+      "Do allow the boundary-hidden capsule-only state and hide capsule plus handles during click-through.",
+      "Do rely on native macOS menus, materials, system colors, typography, symbols, and cursor behavior."
+    ],
+    "donts": [
+      "Don't add dashboard chrome, inspectors, floating toolbars, title bars, or opaque framing surfaces.",
+      "Don't place the perimeter stroke inside the aperture.",
+      "Don't add side or midpoint resize handles; the four corners are the complete resize vocabulary.",
+      "Don't restrict movement to border strips or make the transparent aperture feel inert.",
+      "Don't hide the capsule merely because the boundary is hidden.",
+      "Don't add window shadows or decorative animation; state changes are immediate.",
+      "Don't replace native menu affordances or system typography with web-shaped controls or display faces."
+    ]
+  }
+}
