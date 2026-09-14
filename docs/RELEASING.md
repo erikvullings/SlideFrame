@@ -9,6 +9,9 @@ certificate, notarized by Apple, attached to a GitHub Release as a DMG, and publ
 Create a `desktop-release` environment in the SlideFrame repository and add these environment
 secrets:
 
+The commands below use `env -u GH_TOKEN` so the `erikvullings` keychain login is selected instead
+of any process-level GitHub token.
+
 | Secret | Value |
 | --- | --- |
 | `APPLE_CERTIFICATE` | Base64-encoded `.p12` containing the Developer ID Application certificate and private key |
@@ -28,9 +31,9 @@ secrets:
 5. Store both values:
 
    ```bash
-   base64 < SlideFrame.p12 | gh secret set APPLE_CERTIFICATE \
+   base64 < SlideFrame.p12 | env -u GH_TOKEN gh secret set APPLE_CERTIFICATE \
      --repo erikvullings/SlideFrame --env desktop-release
-   gh secret set APPLE_CERTIFICATE_PASSWORD \
+   env -u GH_TOKEN gh secret set APPLE_CERTIFICATE_PASSWORD \
      --repo erikvullings/SlideFrame --env desktop-release
    ```
 
@@ -44,11 +47,11 @@ Delete the exported `.p12` after GitHub confirms the secret was stored.
 4. Store all three values:
 
    ```bash
-   gh secret set APPLE_API_KEY \
+   env -u GH_TOKEN gh secret set APPLE_API_KEY \
      --repo erikvullings/SlideFrame --env desktop-release
-   gh secret set APPLE_API_ISSUER \
+   env -u GH_TOKEN gh secret set APPLE_API_ISSUER \
      --repo erikvullings/SlideFrame --env desktop-release
-   gh secret set APPLE_API_KEY_P8 \
+   env -u GH_TOKEN gh secret set APPLE_API_KEY_P8 \
      --repo erikvullings/SlideFrame --env desktop-release < AuthKey_<KEY_ID>.p8
    ```
 
@@ -63,7 +66,7 @@ Keep the `.p8` file in a secure credential store.
 4. Store it:
 
    ```bash
-   gh secret set HOMEBREW_TAP_TOKEN \
+   env -u GH_TOKEN gh secret set HOMEBREW_TAP_TOKEN \
      --repo erikvullings/SlideFrame --env desktop-release
    ```
 
