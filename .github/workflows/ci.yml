@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-build:
+    name: Test and build macOS app
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Run unit tests
+        run: >
+          xcodebuild test
+          -project SlideFrame.xcodeproj
+          -scheme SlideFrame
+          -destination 'platform=macOS'
+          SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
+          CODE_SIGNING_ALLOWED=NO
+
+      - name: Build universal Release app
+        run: >
+          xcodebuild build
+          -project SlideFrame.xcodeproj
+          -scheme SlideFrame
+          -configuration Release
+          -derivedDataPath "$RUNNER_TEMP/DerivedData"
+          -destination 'generic/platform=macOS'
+          ARCHS='arm64 x86_64'
+          ONLY_ACTIVE_ARCH=NO
+          SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
+          CODE_SIGNING_ALLOWED=NO
+
+      - name: Verify universal app
+        run: |
+          APP="$RUNNER_TEMP/DerivedData/Build/Products/Release/SlideFrame.app"
+          test -d "$APP"
+          test "$(plutil -extract LSUIElement raw "$APP/Contents/Info.plist")" = true
+          ARCHITECTURES="$(lipo -archs "$APP/Contents/MacOS/SlideFrame")"
+          grep -qw arm64 <<< "$ARCHITECTURES"
+          grep -qw x86_64 <<< "$ARCHITECTURES"
+          ditto -c -k --keepParent "$APP" SlideFrame-unsigned.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SlideFrame-unsigned-${{ github.sha }}
+          path: SlideFrame-unsigned.zip
+          if-no-files-found: error
+          retention-days: 14

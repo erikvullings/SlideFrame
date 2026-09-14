@@ -1,0 +1,214 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Sign, notarize, and publish
+    if: github.event_name == 'push'
+    runs-on: macos-15
+    timeout-minutes: 60
+    environment: desktop-release
+    outputs:
+      asset_name: ${{ steps.package.outputs.asset_name }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Validate release version
+        id: version
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Run unit tests
+        run: >
+          xcodebuild test
+          -project SlideFrame.xcodeproj
+          -scheme SlideFrame
+          -destination 'platform=macOS'
+          SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
+          CODE_SIGNING_ALLOWED=NO
+
+      - name: Import Developer ID Application certificate
+        uses: apple-actions/import-codesign-certs@v7
+        with:
+          p12-file-base64: ${{ secrets.APPLE_CERTIFICATE }}
+          p12-password: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+
+      - name: Install Developer ID G2 intermediate certificate
+        run: |
+          CERTIFICATE_PATH="$RUNNER_TEMP/DeveloperIDG2CA.cer"
+          curl --fail --silent --show-error --location \
+            https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer \
+            --output "$CERTIFICATE_PATH"
+          echo "f16cd3c54c7f83cea4bf1a3e6a0819c8aaa8e4a1528fd144715f350643d2df3a  $CERTIFICATE_PATH" |
+            shasum -a 256 -c -
+          security import "$CERTIFICATE_PATH" -k signing_temp.keychain -f x509 || true
+
+      - name: Select signing identity
+        run: |
+          IDENTITY="$(
+            security find-identity -v -p codesigning |
+              awk -F'"' '/Developer ID Application/ { print $2; exit }'
+          )"
+          test -n "$IDENTITY"
+          echo "APPLE_SIGNING_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
+
+      - name: Prepare App Store Connect API key
+        env:
+          APPLE_API_KEY_P8: ${{ secrets.APPLE_API_KEY_P8 }}
+        run: |
+          test -n "$APPLE_API_KEY_P8"
+          printf '%s' "$APPLE_API_KEY_P8" > "$RUNNER_TEMP/AuthKey.p8"
+          chmod 600 "$RUNNER_TEMP/AuthKey.p8"
+
+      - name: Build universal Release app
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: >
+          xcodebuild build
+          -project SlideFrame.xcodeproj
+          -scheme SlideFrame
+          -configuration Release
+          -derivedDataPath "$RUNNER_TEMP/DerivedData"
+          -destination 'generic/platform=macOS'
+          ARCHS='arm64 x86_64'
+          ONLY_ACTIVE_ARCH=NO
+          SWIFT_TREAT_WARNINGS_AS_ERRORS=YES
+          CODE_SIGNING_ALLOWED=NO
+          MARKETING_VERSION="$VERSION"
+
+      - name: Sign and notarize app
+        env:
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+        run: |
+          APP="$RUNNER_TEMP/DerivedData/Build/Products/Release/SlideFrame.app"
+          test -d "$APP"
+          plutil -replace CFBundleShortVersionString \
+            -string "${{ steps.version.outputs.version }}" "$APP/Contents/Info.plist"
+          codesign --force --deep --options runtime --timestamp \
+            --sign "$APPLE_SIGNING_IDENTITY" "$APP"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+          ditto -c -k --keepParent "$APP" "$RUNNER_TEMP/SlideFrame-notary.zip"
+          xcrun notarytool submit "$RUNNER_TEMP/SlideFrame-notary.zip" \
+            --key "$RUNNER_TEMP/AuthKey.p8" \
+            --key-id "$APPLE_API_KEY" \
+            --issuer "$APPLE_API_ISSUER" \
+            --wait \
+            --timeout 30m
+          xcrun stapler staple "$APP"
+          xcrun stapler validate "$APP"
+          spctl --assess --type execute --verbose=4 "$APP"
+
+      - name: Create, sign, and notarize DMG
+        id: package
+        env:
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          APP="$RUNNER_TEMP/DerivedData/Build/Products/Release/SlideFrame.app"
+          ASSET_NAME="SlideFrame-${VERSION}-universal.dmg"
+          hdiutil create \
+            -volname "SlideFrame" \
+            -srcfolder "$APP" \
+            -format UDZO \
+            -ov "$ASSET_NAME"
+          codesign --force --timestamp --sign "$APPLE_SIGNING_IDENTITY" "$ASSET_NAME"
+          xcrun notarytool submit "$ASSET_NAME" \
+            --key "$RUNNER_TEMP/AuthKey.p8" \
+            --key-id "$APPLE_API_KEY" \
+            --issuer "$APPLE_API_ISSUER" \
+            --wait \
+            --timeout 30m
+          xcrun stapler staple "$ASSET_NAME"
+          xcrun stapler validate "$ASSET_NAME"
+          codesign --verify --strict --verbose=2 "$ASSET_NAME"
+          hdiutil verify "$ASSET_NAME"
+          echo "asset_name=$ASSET_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Verify release bundle
+        run: |
+          APP="$RUNNER_TEMP/DerivedData/Build/Products/Release/SlideFrame.app"
+          test "$(plutil -extract LSUIElement raw "$APP/Contents/Info.plist")" = true
+          codesign -dv --verbose=4 "$APP" 2>&1 |
+            grep -F "Authority=Developer ID Application"
+          ARCHITECTURES="$(lipo -archs "$APP/Contents/MacOS/SlideFrame")"
+          grep -qw arm64 <<< "$ARCHITECTURES"
+          grep -qw x86_64 <<< "$ARCHITECTURES"
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.package.outputs.asset_name }}
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+
+      - name: Remove temporary signing credentials
+        if: always()
+        run: rm -f "$RUNNER_TEMP/AuthKey.p8" "$RUNNER_TEMP/SlideFrame-notary.zip"
+
+  homebrew:
+    name: Update Homebrew cask
+    needs: release
+    if: github.event_name == 'push'
+    runs-on: macos-15
+    environment: desktop-release
+    steps:
+      - name: Download released DMG
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ASSET_NAME: ${{ needs.release.outputs.asset_name }}
+        run: >
+          gh release download "$GITHUB_REF_NAME"
+          --repo "$GITHUB_REPOSITORY"
+          --pattern "$ASSET_NAME"
+          --dir package-input
+
+      - name: Generate SlideFrame cask
+        env:
+          ASSET_NAME: ${{ needs.release.outputs.asset_name }}
+          VERSION: ${{ needs.release.outputs.version }}
+        run: |
+          SHA256="$(shasum -a 256 "package-input/$ASSET_NAME" | cut -d ' ' -f 1)"
+          mkdir -p generated-cask
+          cat > generated-cask/slideframe.rb <<EOF
+          cask "slideframe" do
+            version "$VERSION"
+            sha256 "$SHA256"
+
+            url "https://github.com/erikvullings/SlideFrame/releases/download/v#{version}/SlideFrame-#{version}-universal.dmg"
+            name "SlideFrame"
+            desc "Exact-size screenshot framing guide for macOS"
+            homepage "https://github.com/erikvullings/SlideFrame"
+
+            app "SlideFrame.app"
+          end
+          EOF
+
+      - uses: actions/checkout@v5
+        with:
+          repository: erikvullings/homebrew-tap
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: homebrew-tap
+
+      - name: Commit cask to tap
+        run: |
+          mkdir -p homebrew-tap/Casks
+          cp generated-cask/slideframe.rb homebrew-tap/Casks/slideframe.rb
+          git -C homebrew-tap config user.name "github-actions[bot]"
+          git -C homebrew-tap config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C homebrew-tap add Casks/slideframe.rb
+          git -C homebrew-tap diff --cached --quiet && exit 0
+          git -C homebrew-tap commit -m "slideframe ${{ needs.release.outputs.version }}"
+          git -C homebrew-tap push

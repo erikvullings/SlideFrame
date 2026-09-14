@@ -10,6 +10,15 @@ SlideFrame is a macOS 14+ menu-bar utility for positioning an exact screenshot g
 - Package: `./scripts/package.sh`
 - Start: `open release/SlideFrame.app`
 
+CI builds and tests every push as a universal macOS app. Tagged releases are Developer ID signed,
+Apple-notarized, and published through GitHub Releases and Homebrew. See
+[`docs/RELEASING.md`](docs/RELEASING.md) for the one-time secret setup and release procedure.
+
+```bash
+brew tap erikvullings/tap
+brew install --cask slideframe
+```
+
 SlideFrame is menu-bar-only: it has no Dock icon or main window. Use its menu-bar icon to show/hide the guide, choose a size or ratio, fit or center it, change its border color, enable click-through, reset, or quit.
 
 ## Guide semantics
